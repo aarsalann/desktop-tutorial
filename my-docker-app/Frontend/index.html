@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mini To-Do List</title>
+</head>
+<body>
+    <h1>My To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="New task...">
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList"></ul>
+
+    <script>
+        const API_URL = 'http://localhost:9000/api/tasks';
+
+        window.onload = loadTasks;
+
+        function loadTasks() {
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const list = document.getElementById('taskList');
+                    list.innerHTML = ""; 
+                    data.tasks.forEach(task => {
+                        let li = document.createElement('li');
+                        li.innerText = task.text + " ";
+                        
+                        let btn = document.createElement('button');
+                        btn.innerText = "Done";
+                        btn.onclick = () => deleteTask(task.id);
+                        
+                        li.appendChild(btn);
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task: input.value }) 
+            }).then(() => {
+                input.value = ""; 
+                loadTasks(); 
+            });
+        }
+
+        function deleteTask(taskId) {
+            fetch(API_URL, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: taskId })
+            }).then(() => loadTasks());
+        }
+    </script>
+</body>
+</html>

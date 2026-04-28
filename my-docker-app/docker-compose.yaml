@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  backend-api:
+    build: ./backend
+    ports:
+      - "9000:9000"
+
+  frontend-ui:
+    build: ./frontend
+    ports:
+      - "8080:80" # Maps port 8080 on your computer to port 80 inside Nginx
+    depends_on:
+      - backend-api
